@@ -1,0 +1,20 @@
+Sub RunAll()
+'
+' RunAll Macro
+'
+    SortAndFilter
+    CompareAndClc
+    MsgBox ("Done! Check manually then click on button")
+    button_maker
+End Sub
+
+Sub button_maker()
+    Dim r As Range
+    'Set r = Selection
+        ActiveSheet.Buttons.Add(1020, 350, 100, 50).Select
+        With Selection
+            .OnAction = "FinalFormating"
+            .Characters.Text = "End"
+        End With
+        Range("A2").Select
+End Sub
