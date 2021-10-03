@@ -1,0 +1,72 @@
+Option Explicit
+
+Function kimlik(tc As String, ad As String, soyad As String, tarih As Date, uyruk As String) As String
+Dim gun As String
+gun = Day(tarih)
+Dim ay As String
+ay = Month(tarih)
+Dim yil As String
+yil = Year(tarih)
+Dim sonuc As String
+uyruk = LCase(uyruk)
+If uyruk = "tc" Or uyruk = "t.c." Or uyruk = "turk" Or uyruk = "türk" Then
+sonuc = tcVatandasi(tc, ad, soyad, yil)
+Else
+sonuc = yabanci(tc, ad, soyad, gun, ay, yil)
+End If
+If InStr(sonuc, "true") > 0 Then
+kimlik = "Dogru"
+Else
+kimlik = "Yanlis"
+End If
+End Function
+
+Function tcVatandasi(tc As String, ad As String, soyad As String, yil As String)
+Dim xmlhttp As MSXML2.XMLHTTP60
+Set xmlhttp = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+Dim myDom As MSXML2.DOMDocument60
+Set myDom = CreateObject("MSXML2.DOMDocument.6.0")
+myDom.async = False
+Dim myxml As String
+myxml = "<?xml version='1.0' encoding='utf - 8'?>" & _
+"<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'  xmlns:xsd='http://www.w3.org/2001/XMLSchema'  xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>" & _
+"    <soap:Body>" & _
+"        <TCKimlikNoDogrula xmlns='http://tckimlik.nvi.gov.tr/WS'>" & _
+"            <TCKimlikNo>" & tc & "</TCKimlikNo>" & _
+"            <Ad>" & ad & "</Ad>" & _
+"            <Soyad>" & soyad & "</Soyad>" & _
+"            <DogumYili>" & yil & "</DogumYili>" & _
+"        </TCKimlikNoDogrula>" & _
+"    </soap:Body>" & "</soap:Envelope>"
+myDom.LoadXML (myxml)
+xmlhttp.Open "post", "https://tckimlik.nvi.gov.tr/Service/KPSPublic.asmx", False
+xmlhttp.setRequestHeader "Content-Type", "text/xml; charset=utf-8"
+xmlhttp.send (myDom.XML)
+turk = xmlhttp.responseText
+End Function
+
+Function yabanci(tc As String, ad As String, soyad As String, gun As String, ay As String, yil As String)
+Dim xmlhttp As MSXML2.XMLHTTP60
+Set xmlhttp = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+Dim myDom As MSXML2.DOMDocument60
+Set myDom = CreateObject("MSXML2.DOMDocument.6.0")
+myDom.async = False
+Dim myxml As String
+myxml = "<?xml version='1.0' encoding='utf - 8'?>" & _
+"<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'  xmlns:xsd='http://www.w3.org/2001/XMLSchema'  xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>" & _
+"    <soap:Body>" & _
+"        <YabanciKimlikNoDogrula xmlns='http://tckimlik.nvi.gov.tr/WS'>" & _
+"            <KimlikNo>" & tc & "</KimlikNo>" & _
+"            <Ad>" & ad & "</Ad>" & _
+"            <Soyad>" & soyad & "</Soyad>" & _
+"            <DogumGun>" & gun & "</DogumGun>" & _
+"            <DogumAy>" & ay & "</DogumAy>" & _
+"            <DogumYil>" & yil & "</DogumYil>" & _
+"        </YabanciKimlikNoDogrula>" & _
+"    </soap:Body>" & "</soap:Envelope>"
+myDom.LoadXML (myxml)
+xmlhttp.Open "post", "https://tckimlik.nvi.gov.tr/Service/KPSPublicYabanciDogrula.asmx", False
+xmlhttp.setRequestHeader "Content-Type", "text/xml; charset=utf-8"
+xmlhttp.send (myDom.XML)
+yabanci = xmlhttp.responseText
+End Function
