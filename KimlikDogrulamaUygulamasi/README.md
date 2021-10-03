@@ -7,6 +7,7 @@ Excel VBA ile kimlik bilgilerini doğrulama aracıdır.
 İlk olarak VBA Code ekranından Tools -> References'a girip 
 - Microsoft WinHTTP Services
 - Microsoft XML, v6.0
+
 Referans dosyalarını projemize eklememiz gerekmektedir, ardından Excel penceresine girip formül çubuğuna aşağıdaki fonkisyonu yazabiliriz
 
 ```bash
