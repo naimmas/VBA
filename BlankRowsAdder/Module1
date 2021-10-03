@@ -1,0 +1,12 @@
+Sub AddBlankRows()
+
+    rangeOfTest = Range("", Selection.End(xlToRight))
+    Range("B8").Select 'Cell to add after
+    ofset = 1
+    For Each test In rangeOfTest
+        For i = 1 To test
+            ActiveCell.Offset(ofset).EntireRow.Insert Shift:=xlShiftDown
+        Next i
+        ofset = ofset + test + 4 'offset between first cell and next
+    Next test
+End Sub
