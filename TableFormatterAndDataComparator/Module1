@@ -1,0 +1,132 @@
+Sub SortAndFilter()
+
+
+    Range("A2").Select
+    ran = CStr(ActiveCell.End(xlDown).Row)
+    Range("A1").CurrentRegion.Select
+    Cells.Select
+    Selection.RemoveDuplicates Columns:=6, Header:=xlYes
+    Range("A2").Select
+    ActiveSheet.Sort.SortFields.Clear
+    ActiveSheet.Sort.SortFields.Add2 Key:=Range _
+        ("C2:C" & ran), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:= _
+        xlSortNormal
+    With ActiveSheet.Sort
+        .SetRange Range("A1:T" & ran)
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    Range("C2").Select
+    Columns("F:F").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Range("F2").Select
+    ActiveCell.FormulaR1C1 = "=RC[-3]&RC[-2]&RC[-1]"
+    Range("F2").Select
+    Selection.AutoFill Destination:=Range("F2:F" & ran)
+    Range("F2:F" & ran).Select
+    For Each oRange In ActiveSheet.Range("F2:F" & ran)
+        oRange.Value = Replace(oRange.Value, " ", "")
+    Next
+End Sub
+Sub CompareAndClc()
+
+
+    Dim pName As String
+    pName = ActiveSheet.Name
+    Range("A2").Select
+    ran = CStr(ActiveCell.End(xlDown).Row)
+    Columns("F:F").Select
+    Selection.FormatConditions.AddUniqueValues
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    Selection.FormatConditions(1).DupeUnique = xlDuplicate
+    With Selection.FormatConditions(1).Font
+        .Color = -16383844
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13551615
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+    Range("E1").Select
+    Rows("1:1").Select
+    Selection.AutoFilter
+    ActiveWorkbook.Worksheets(pName).AutoFilter.Sort.SortFields.Add( _
+        Range("F1"), xlSortOnCellColor, xlAscending, , xlSortNormal).SortOnValue.Color _
+        = RGB(255, 199, 206)
+    With ActiveWorkbook.Worksheets(pName).AutoFilter.Sort
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    Range("F2").Select
+End Sub
+Sub FinalFormating()
+
+
+    Dim pName As String
+    pName = ActiveSheet.Name
+    Range("A2").Select
+    ran = CStr(ActiveCell.End(xlDown).Row)
+    Columns("F:F").Select
+    Selection.Delete Shift:=xlToLeft
+    Columns("G:H").Select
+    Selection.Delete Shift:=xlToLeft
+    Columns("H:H").Select
+    Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Range("H1").Select
+    ActiveCell.FormulaR1C1 = "TestNo"
+    Range("I2").Select
+    Dim Name As String
+    Name = ActiveWorkbook.Name
+    num = GetNumeric(Name)
+    Range("H2").Value = num
+    Range("A2", ActiveCell.End(xlDown)).Select
+    Range("H2").Select
+    Selection.AutoFill Destination:=Range("H2:H" & ran)
+    testDeg = InputBox("Please Input total score")
+    Range("A2").Select
+    For Each oRange In Range("B2:B" & CStr(ActiveCell.End(xlDown).Row))
+        oRange.Value2 = oRange.Value * 100 / testDeg
+    Next
+    Columns("B:B").Select
+    Selection.NumberFormat = "0.00"
+    ActiveSheet.Buttons.Delete
+    Range("C2:E2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    For Each x In Selection
+        x.Value = Trim(x.Value)
+    Next
+    Cells.Select
+    ActiveSheet.Sort.SortFields.Clear
+    ActiveSheet.Sort.SortFields.Add2 Key:=Range _
+        ("C2:C192"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:= _
+        xlSortNormal
+    With ActiveWorkbook.Worksheets(pName).Sort
+        .SetRange Range("A1:Y192")
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    Range("B2:H2").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Selection.Copy
+    MsgBox ("Ready for paste")
+End Sub
+
+Function GetNumeric(CellRef As String)
+Dim StringLength As Integer
+StringLength = Len(CellRef)
+For i = 1 To StringLength
+If IsNumeric(Mid(CellRef, i, 1)) Then Result = Result & Mid(CellRef, i, 1)
+Next i
+GetNumeric = Result
+End Function
