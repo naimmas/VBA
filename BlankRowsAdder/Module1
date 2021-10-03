@@ -1,5 +1,8 @@
 Sub AddBlankRows()
-
+'
+'Count of rows for every cycle will be determined by an array in any row in document just select the first cell in array
+'and the program will add empty rows starts from B8 cell with offset specified below for every element in array until the end of array
+'
     rangeOfTest = Range("", Selection.End(xlToRight))
     Range("B8").Select 'Cell to add after
     ofset = 1
